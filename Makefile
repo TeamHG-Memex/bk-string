@@ -1,10 +1,11 @@
-CC=gcc
-INCLUDES= -I./src -I../src -I./ -I./test
-SRCS= src/bknode.c src/bkslist.c src/bkstring.c src/bkutil.c
-DEPS= src/bkstring.h src/bknode.h src/bkslist.h src/bkutil.h
-OBJECTS= $(SRCS:.c=.o)
+CC=gcc -fPIC
+ARCHIVE=ar rcs
+INCLUDES= -I./src -I./includes -I./test
+SOURCES= $(shell echo src/*.c)
+HEADERS= $(shell echo src/*.h)
+OBJECTS= $(SOURCES:.c=.o)
 
-default: bench test
+default: bench test shared static
 
 bench: benchmark/bench.o $(OBJECTS)
 	$(CC) -o benchmark/bench benchmark/bench.o $(OBJECTS) $(INCLUDES)
@@ -12,9 +13,19 @@ bench: benchmark/bench.o $(OBJECTS)
 test: test/test.o $(OBJECTS)
 	$(CC) -o test/test test/test.o $(OBJECTS) $(INCLUDES)
 
-%.o: %.c $(DEPS)
-		$(CC) -c $(INCLUDES) $< -o $@
+shared: $(OBJECTS)
+	$(CC) -o build/libbkstring.so -shared $(OBJECTS) $(INCLUDES)
+
+static: $(OBJECTS)
+	$(ARCHIVE) build/libbkstring.a $(OBJECTS)
+
+%.o: %.c $(HEADERS)
+	$(CC) -c $(INCLUDES) $< -o $@
 
 clean:
 	-rm -f src/*.o
 	-rm -f test/*.o
+	-rm -f benchmark/*.o
+	-rm -f test/test
+	-rm -f benchmark/bench
+	-rm -f src/bkstring.so

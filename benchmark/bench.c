@@ -24,12 +24,16 @@ void print_time(void* str_arg, struct timeval start, struct timeval end) {
 }
 
 int main(int argc, char *argv[]) {
+  if (argc < 4) {
+    printf("Not enough arguments given, expected input:\n    bench <filename> <word> <distance>\n");
+  }
 
-  FILE *fp;
-  uint8_t line[256];
   uint8_t *filename = argv[1];
   uint8_t *word = argv[2];
   uint64_t dist = atoi(argv[3]);
+
+  FILE *fp;
+  uint8_t line[256];
 
   fp = fopen(filename, "r");
   if (fp == NULL) {
@@ -64,12 +68,19 @@ int main(int argc, char *argv[]) {
   uint8_t **list = b.Search(word, dist, &b);
   gettimeofday(&search_end, NULL);
   gettimeofday(&end, NULL);
-  free(list);
   clear_bktree(&b);
 
-
-  print_time("build in:", build_start, build_end);
-  print_time("search in:", search_start, search_end);
+  printf("Words found in file within %zu edits of %s.\n", dist, word);
+  printf("%s", list[0]);
+  i = 1;
+  while (list[i] != NULL) {
+    printf(", %s", list[i]);
+    i += 1;
+  }
+  printf("\n");
+  free(list);
+  print_time("build time:", build_start, build_end);
+  print_time("search time:", search_start, search_end);
 
   print_time("total time:", start, end);
 

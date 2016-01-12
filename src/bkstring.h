@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 #include "bknode.h"
-
 typedef struct BKTree BKTree;
 struct BKTree {
   BKNode _root;

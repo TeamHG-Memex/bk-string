@@ -8,7 +8,10 @@
 
 // To search the BK Tree for a list of words within a given distance:
 //   char** list = b.Search(char* word, int distance, BKTree* b);
-//   assert(list[0] == "foo");
+//   assert(!strcmp(list[0], "foo"));
+
+// Don't forget to free your search list when you're done with it!
+//   free(list);
 
 
 // A Thank You:
@@ -23,8 +26,6 @@
 #include "bkslist.h"
 #include "bkstring.h"
 
-// DOING:0 Create a makefile.
-// TODO:20 Create a header file to import BK Tree.
 // TODO:10 Add the ability to add an array of strings to the BK Tree.
 // TODO:0 Add python wrapper for the following BK Tree functionality:
 //      .Add()

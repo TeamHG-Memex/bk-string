@@ -9,10 +9,22 @@ To build everything:
 To build tests only:
 1. Navigate to ``./bk-string``
 1. Run ``make test``
+1. Builds ``./test/test`` executable
 
 To build benchmarks only:
 1. Navigate to ``./bk-string``
 1. Run ``make bench``
+1. Builds ``./benchmark/bench`` executable
+
+To build shared library only:
+1. Navigate to ``./bk-string``
+1. Run ``make shared``
+1. Builds ``./build/libbkstring.so`` executable
+
+To build static library only:
+1. Navigate to ``./bk-string``
+1. Run ``make static``
+1. Builds ``./build/libbkstring.a`` executable
 
 ## Usage
 To use simply:
