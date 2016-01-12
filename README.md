@@ -4,27 +4,27 @@ BK Word is a C implementation of a BK Tree for strings.
 ## Building BK String
 To build everything:
 1. Navigate to ``./bk-string``
-1. Run ``make``
+2. Run ``make``
 
 To build tests only:
 1. Navigate to ``./bk-string``
-1. Run ``make test``
-1. Builds ``./test/test`` executable
+2. Run ``make test``
+3. Builds ``./test/test`` executable
 
 To build benchmarks only:
 1. Navigate to ``./bk-string``
-1. Run ``make bench``
-1. Builds ``./benchmark/bench`` executable
+2. Run ``make bench``
+3. Builds ``./benchmark/bench`` executable
 
 To build shared library only:
 1. Navigate to ``./bk-string``
-1. Run ``make shared``
-1. Builds ``./build/libbkstring.so`` executable
+2. Run ``make shared``
+3. Builds ``./build/libbkstring.so`` executable
 
 To build static library only:
 1. Navigate to ``./bk-string``
-1. Run ``make static``
-1. Builds ``./build/libbkstring.a`` executable
+2. Run ``make static``
+3. Builds ``./build/libbkstring.a`` executable
 
 ## Usage
 To use simply:
@@ -73,7 +73,7 @@ If you ran the ``Makefile``, an executable benchmark file was created at ``./ben
 
 ### What is measured:
 1. Building a BK Tree based off of each word presented in the file.
-1. Searching that tree for all strings which are within a distance of the given string.
+2. Searching that tree for all strings which are within a distance of the given string.
 
 Example Command:
 
