@@ -1,44 +1,49 @@
 #ifndef SEARCH_LIST_H
 #define SEARCH_LIST_H
 #include <stdlib.h>
+#include <stdint.h>
+#include <stdio.h>
 
-const int LIST_LEN = 2;
+#include "bkutil.c"
+
+const uint64_t LIST_LEN = 1024;
 
 typedef struct SearchList SearchList;
 struct SearchList {
-  char** list;
-  int size;
-  int used;
+  uint8_t** list;
+  uint64_t size;
+  uint64_t used;
 };
 
 // Doubles the size of a given Search List
 void grow_list(SearchList *s_list) {
-  int newSize = s_list->size * 2 * sizeof(char*);
-  char** temp = malloc(newSize);
+  // Add the word to the last index in the array.
+  uint64_t newSize = s_list->size * 2;
+  uint8_t** temp = handle_calloc(newSize, sizeof(uint8_t*));
 
   // Add all items in the Search List to the temp array.
-  for (int i = 0; i <= s_list->size; i++) {
+  for (uint64_t i = 0; i < s_list->size; i++) {
     temp[i] = s_list->list[i];
   }
 
-  // Allocate the Search List
-  s_list->list = malloc(newSize);
-  s_list->list = temp;
-  free(temp);
+  free(s_list->list);
 
-  // Set the Search List's size.
-  s_list->size = s_list->size * 2;
+  // Allocate the Search List
+  s_list->list = temp;
+
+  // Set the new Search List size.
+  s_list->size = newSize;
 };
 
 // Adds a word to a Search List
-void list_add(char *word, SearchList* s_list) {
+void list_add(void *word_arg, SearchList* s_list) {
+  uint8_t *word = word_arg;
   // If the number of indexes used is equal to the size of the array:
   if (s_list->used == s_list->size) {
     // Make the array larger.
     grow_list(s_list);
   }
 
-  // Add the word to the last index in the array.
   s_list->list[s_list->used] = word;
   s_list->used += 1;
 };
@@ -46,9 +51,9 @@ void list_add(char *word, SearchList* s_list) {
 // Returns an initialized Search List
 SearchList init_search_list() {
   SearchList s_list;
-  s_list.list = malloc(sizeof(char*) * LIST_LEN);
   s_list.size = LIST_LEN;
   s_list.used = 0;
+  s_list.list = handle_calloc(LIST_LEN, sizeof(uint8_t*));
 
   return s_list;
 };

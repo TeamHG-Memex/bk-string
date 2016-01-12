@@ -22,31 +22,42 @@
 #ifndef BK_H
 #define BK_H
 
-#include "./lib/bknode.c"
-#include "./lib/bkutil.c"
-#include "./lib/bkslist.c"
+#include "lib/bknode.c"
+#include "lib/bkutil.c"
+#include "lib/bkslist.c"
+#include <inttypes.h>
 
 typedef struct BKTree BKTree;
 struct BKTree {
   BKNode _root;
-  SearchList _list;
-  void (*Add) (char *, BKTree *);
-  char** (*Search) (char *, int, BKTree*);
+  void (*Add) (void *, BKTree *);
+  void* (*Search) (void *, uint64_t, BKTree*);
 };
 
+// TODO: Create a makefile.
+// TODO: Create a header file to import BK Tree.
+// TODO: Add the ability to add an array of strings to the BK Tree.
+// TODO: Add python wrapper for the following BK Tree functionality:
+//      .Add()
+//      .Search()
+//      init_bk_tree()
+//      free_bk_tree()
+
 // A function to add a word to a BK Tree.
-void bk_add(char *word, BKTree *self) {
+void bk_add(void *word_arg, BKTree *self) {
+
+  uint8_t *word = word_arg;
   // Check the root for an entry.
-  if (self->_root.empty) {
-    self->_root.empty = 0;
+  if (self->_root.empty == 1) {
     self->_root.word = word;
+    self->_root.empty = 0;
 
     return;
   }
 
   // Initialize vars needed for tree buildling.
   BKNode *curNode = &self->_root;
-  int dist = l_dist(curNode->word, word);
+  size_t dist = l_dist(curNode->word, word);
 
   while (!curNode->child[dist].empty) {
     if (dist == 0) {
@@ -67,24 +78,31 @@ void bk_add(char *word, BKTree *self) {
 };
 
 // Recursively search a Node and add the search results to a given Search List.
-void r_search(char *word, int dist, SearchList *s_list, BKNode *node) {
+void r_search(void *word_arg, uint64_t dist, SearchList *s_list, BKNode *node) {
   if (node->empty) {
     return;
   }
 
-  int curDist = l_dist(node->word, word);
+  uint8_t *word = word_arg;
+  uint64_t curDist = l_dist(node->word, word);
+  uint64_t minDist;
 
   // If current distance is less than the search distance:
   if (curDist <= dist) {
     // Add that word to the search list.
     list_add(node->word, s_list);
+
+    // minDist is set to 0 because it is an unsigned int.
+    minDist = 0;
+  } else {
+    // minDist is set to the minimum distance allowed from the current word.
+    minDist = curDist - dist;
   }
 
-  int minDist = curDist - dist;
-  int maxDist = curDist + dist;
+  uint64_t maxDist = curDist + dist;
 
   // Loop through all node children
-  for (int i = 0; i <= node->size; i++) {
+  for (uint64_t i = 0; i <= node->size; i++) {
     // If the distance of the child at "i" is within the allowable distance from
     // the search word:
     if (i >= minDist && i <= maxDist && !node->child[i].empty) {
@@ -95,20 +113,24 @@ void r_search(char *word, int dist, SearchList *s_list, BKNode *node) {
 };
 
 // Begin a search on a given BK Tree
-char** search(char *word, int dist, BKTree *b) {
+void* search(void *word_arg, uint64_t dist, BKTree *b) {
+  uint8_t *word = word_arg;
   BKNode *node = &b->_root;
-  SearchList* s_list = &b->_list;
+  SearchList s_list = init_search_list();
 
-  r_search(word, dist, s_list, node);
+  r_search(word, dist, &s_list, node);
 
-  return s_list->list;
+  // Ensure the Search List terminates with NULL, so users can predictably find
+  // the end.
+  list_add(NULL, &s_list);
+
+  return s_list.list;
 };
 
 // Returns an initialized BK Tree.
-BKTree init_bk_tree() {
+BKTree init_bktree() {
   BKTree b;
   b._root = init_bknode();
-  b._list = init_search_list();
 
   b.Add = bk_add;
   b.Search = search;
@@ -116,4 +138,7 @@ BKTree init_bk_tree() {
   return b;
 };
 
+void clear_bktree(BKTree *bk) {
+  clear_bknode(bk->_root);
+}
 #endif
