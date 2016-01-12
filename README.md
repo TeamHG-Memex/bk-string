@@ -63,6 +63,11 @@ If you ran the ``Makefile``, an executable benchmark file was created at ``./ben
 1. Building a BK Tree based off of each word presented in the file.
 1. Searching that tree for all strings which are within a distance of the given string.
 
+Example Command:
+
+    // Search for all words within 2 Levenshtein distance of "foo" from the file "/path/to/strings.txt"
+    $ ./bench /path/to/strings.txt foo 2
+
 ### How to structure the file:
 Simply create a file of words, with each word on a new line.
 
