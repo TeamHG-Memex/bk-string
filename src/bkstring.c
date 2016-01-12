@@ -19,25 +19,14 @@
 
 // Thanks Jerry!
 
-#ifndef BK_H
-#define BK_H
+#include "bkutil.h"
+#include "bkslist.h"
+#include "bkstring.h"
 
-#include "lib/bknode.c"
-#include "lib/bkutil.c"
-#include "lib/bkslist.c"
-#include <inttypes.h>
-
-typedef struct BKTree BKTree;
-struct BKTree {
-  BKNode _root;
-  void (*Add) (void *, BKTree *);
-  void* (*Search) (void *, uint64_t, BKTree*);
-};
-
-// TODO: Create a makefile.
-// TODO: Create a header file to import BK Tree.
-// TODO: Add the ability to add an array of strings to the BK Tree.
-// TODO: Add python wrapper for the following BK Tree functionality:
+// DOING:0 Create a makefile.
+// TODO:20 Create a header file to import BK Tree.
+// TODO:10 Add the ability to add an array of strings to the BK Tree.
+// TODO:0 Add python wrapper for the following BK Tree functionality:
 //      .Add()
 //      .Search()
 //      init_bk_tree()
@@ -138,7 +127,7 @@ BKTree init_bktree() {
   return b;
 };
 
+// Deallocates the BK Tree
 void clear_bktree(BKTree *bk) {
   clear_bknode(bk->_root);
 }
-#endif

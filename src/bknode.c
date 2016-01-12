@@ -1,24 +1,10 @@
-#ifndef BK_NODE_H
-#define BK_NODE_H
-#include <stdlib.h>
-#include <stdint.h>
-
-#include "bkutil.c"
+#include "bkutil.h"
+#include "bknode.h"
 
 // BK Nodes have 256 children, because it is unlikely that a word will be further
 // than 255 in Levenshtein Distance.  We can increase this amount or dynamically
 // grow the child node array if this is found to be unsuitable.
 const uint64_t CHILD_NODES = 256;
-
-typedef struct BKNode BKNode;
-struct BKNode {
-  uint8_t *word;
-  BKNode *child;
-  uint64_t empty;
-  uint64_t size;
-
-  void (*AddChild) (void *, BKNode *);
-};
 
 // Adds a word to a given node.
 void add_child(void *word_arg, BKNode *self) {
@@ -61,4 +47,3 @@ void clear_bknode(BKNode node) {
   free(node.child);
   node.child = NULL;
 }
-#endif

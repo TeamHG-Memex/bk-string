@@ -1,25 +1,5 @@
-#ifndef BKUTIL_H
-#include <string.h>
-#include <stdint.h>
-#include <ctype.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include "bkutil.h"
 
-// Returns the maximum of 2 given values.
-#define max(a, b) \
-  ({ __typeof__ (a) _a = (a); \
-    __typeof__ (b) _b = (b); \
-    _a > _b ? _a : _b; \
-  })
-
-// Returns the minimum of 2 given values.
-#define min(a, b) \
-  ({ __typeof__ (a) _a = (a); \
-    __typeof__ (b) _b = (b); \
-    _a < _b ? _a : _b; \
-  })
-
-#define BKUTIL_H
 // Returns the Levenshtein Distance from 2 words.
 uint64_t l_dist(void *first_word, void *second_word) {
   uint8_t *first = first_word;
@@ -68,4 +48,3 @@ void *handle_calloc(uint64_t len, size_t size) {
 
   return alloc;
 }
-#endif

@@ -1,11 +1,12 @@
-#include "../bkstring.c"
 #include <assert.h>
-#include <stdio.h>
 #include <stdbool.h>
+
+#include "bkstring.h"
+#include "bkutil.h"
 
 // Returns true if a list has a word in it.
 bool has_word(void* list_arg, void* word_arg) {
-  // TODO: Make the "has_word()" implementation work with a full "list_arg."
+  // TODO:30 Make the "has_word()" implementation work with a full "list_arg."
   uint8_t **list = list_arg;
   uint8_t *word = word_arg;
 

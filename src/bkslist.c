@@ -1,19 +1,7 @@
-#ifndef SEARCH_LIST_H
-#define SEARCH_LIST_H
-#include <stdlib.h>
-#include <stdint.h>
-#include <stdio.h>
-
-#include "bkutil.c"
+#include "bkutil.h"
+#include "bkslist.h"
 
 const uint64_t LIST_LEN = 1024;
-
-typedef struct SearchList SearchList;
-struct SearchList {
-  uint8_t** list;
-  uint64_t size;
-  uint64_t used;
-};
 
 // Doubles the size of a given Search List
 void grow_list(SearchList *s_list) {
@@ -57,4 +45,3 @@ SearchList init_search_list() {
 
   return s_list;
 };
-#endif
