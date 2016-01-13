@@ -128,7 +128,16 @@ BKTree init_bktree() {
   return b;
 };
 
+//
+void init(BKTree *b) {
+  *(b) = init_bktree();
+}
+
 // Deallocates the BK Tree
 void clear_bktree(BKTree *bk) {
   clear_bknode(bk->_root);
+}
+
+void close() {
+  exit(EXIT_SUCCESS);
 }

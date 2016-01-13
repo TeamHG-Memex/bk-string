@@ -133,6 +133,8 @@ void test() {
   assert(!has_word(list, "bufar"));
   assert(list[7] == NULL);
   clear_bktree(&b);
+  free(list);
+  list = NULL;
   printf("OK!\n");
 }
 

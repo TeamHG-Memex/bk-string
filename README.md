@@ -3,25 +3,30 @@ BK Word is a C implementation of a BK Tree for strings.
 
 ## Building BK String
 To build everything:
+
 1. Navigate to ``./bk-string``
 2. Run ``make``
 
 To build tests only:
+
 1. Navigate to ``./bk-string``
 2. Run ``make test``
 3. Builds ``./test/test`` executable
 
 To build benchmarks only:
+
 1. Navigate to ``./bk-string``
 2. Run ``make bench``
 3. Builds ``./benchmark/bench`` executable
 
 To build shared library only:
+
 1. Navigate to ``./bk-string``
 2. Run ``make shared``
 3. Builds ``./build/libbkstring.so`` executable
 
 To build static library only:
+
 1. Navigate to ``./bk-string``
 2. Run ``make static``
 3. Builds ``./build/libbkstring.a`` executable
