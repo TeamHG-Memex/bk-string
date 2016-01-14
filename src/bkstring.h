@@ -15,6 +15,5 @@ extern void *search(void *word_arg, uint64_t dist, BKTree *b);
 extern BKTree init_bktree();
 extern void init(BKTree *b);
 extern void clear_bktree(BKTree *bk);
-extern void close();
 
 #endif

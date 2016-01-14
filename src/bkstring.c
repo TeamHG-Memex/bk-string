@@ -128,7 +128,7 @@ BKTree init_bktree() {
   return b;
 };
 
-//
+// Procedural function to set a BK Tree to initialization values
 void init(BKTree *b) {
   *(b) = init_bktree();
 }
@@ -136,8 +136,4 @@ void init(BKTree *b) {
 // Deallocates the BK Tree
 void clear_bktree(BKTree *bk) {
   clear_bknode(bk->_root);
-}
-
-void close() {
-  exit(EXIT_SUCCESS);
 }

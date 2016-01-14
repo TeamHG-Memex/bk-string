@@ -36,6 +36,11 @@ void list_add(void *word_arg, SearchList* s_list) {
   s_list->used += 1;
 };
 
+// Frees a uint8 list
+void free_list(uint8_t** list) {
+  free(list);
+}
+
 // Returns an initialized Search List
 SearchList init_search_list() {
   SearchList s_list;
