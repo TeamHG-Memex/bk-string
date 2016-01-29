@@ -1,5 +1,5 @@
 # BK String
-BK Word is a C implementation of a BK Tree for strings.
+BK String is a C implementation of a BK Tree for strings.
 
 ## Building BK String
 To build everything:
@@ -23,13 +23,13 @@ To build shared library only:
 
 1. Navigate to ``./bk-string``
 2. Run ``make shared``
-3. Builds ``./build/libbkstring.so`` executable
+3. Builds ``./build/libbkstring.so`` dynamic library
 
 To build static library only:
 
 1. Navigate to ``./bk-string``
 2. Run ``make static``
-3. Builds ``./build/libbkstring.a`` executable
+3. Builds ``./build/libbkstring.a`` static library
 
 ## Usage
 To use simply:

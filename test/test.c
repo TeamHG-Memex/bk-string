@@ -24,10 +24,31 @@ bool has_word(void* list_arg, void* word_arg) {
   return false;
 }
 
+uint64_t inject(void *first, void *second) {
+  return 1;
+}
+
 void test() {
+  printf("Testing injection of distance function in BK Tree.\n");
+  BKTree b = new_bktree(inject);
+  b.Add("foo", &b);
+  b.Add("bar", &b);
+
+  assert(b.Dist("foo", "bar") == 1);
+  assert(!strcmp(b._root.child[1].word, "bar"));
+
+  clear_bktree(&b);
+
+  b = init_bktree();
+
+  assert(b.Dist("foo", "bar") == 3);
+
+  clear_bktree(&b);
+  printf("OK!\n");
+
   printf("Testing addition of items in BK Tree.\n");
   // Test the BK Tree's "Add" method.
-  BKTree b = init_bktree();
+  b = init_bktree();
   b.Add("foo", &b);
   assert(!strcmp(b._root.word, "foo"));
   b.Add("bar", &b);

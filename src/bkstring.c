@@ -47,7 +47,7 @@ void bk_add(void *word_arg, BKTree *self) {
 
   // Initialize vars needed for tree buildling.
   BKNode *curNode = &self->_root;
-  size_t dist = l_dist(curNode->word, word);
+  size_t dist = self->Dist(curNode->word, word);
 
   while (!curNode->child[dist].empty) {
     if (dist == 0) {
@@ -56,7 +56,7 @@ void bk_add(void *word_arg, BKTree *self) {
     }
 
     curNode = &curNode->child[dist];
-    dist = l_dist(curNode->word, word);
+    dist = self->Dist(curNode->word, word);
   }
 
   // Since the current child is empty, we must initialize it.
@@ -68,13 +68,13 @@ void bk_add(void *word_arg, BKTree *self) {
 };
 
 // Recursively search a Node and add the search results to a given Search List.
-void r_search(void *word_arg, uint64_t dist, SearchList *s_list, BKNode *node) {
+void r_search(void *word_arg, uint64_t dist, SearchList *s_list, BKNode *node, uint64_t (*dist_function) (void *, void *)) {
   if (node->empty) {
     return;
   }
 
   uint8_t *word = word_arg;
-  uint64_t curDist = l_dist(node->word, word);
+  uint64_t curDist = dist_function(node->word, word);
   uint64_t minDist;
 
   // If current distance is less than the search distance:
@@ -97,7 +97,7 @@ void r_search(void *word_arg, uint64_t dist, SearchList *s_list, BKNode *node) {
     // the search word:
     if (i >= minDist && i <= maxDist && !node->child[i].empty) {
       // Search the child's children for additional words.
-      r_search(word, dist, s_list, &node->child[i]);
+      r_search(word, dist, s_list, &node->child[i], dist_function);
     }
   }
 };
@@ -108,7 +108,7 @@ void* search(void *word_arg, uint64_t dist, BKTree *b) {
   BKNode *node = &b->_root;
   SearchList s_list = init_search_list();
 
-  r_search(word, dist, &s_list, node);
+  r_search(word, dist, &s_list, node, b->Dist);
 
   // Ensure the Search List terminates with NULL, so users can predictably find
   // the end.
@@ -118,19 +118,28 @@ void* search(void *word_arg, uint64_t dist, BKTree *b) {
 };
 
 // Returns an initialized BK Tree.
-BKTree init_bktree() {
+BKTree new_bktree(void* dist_function) {
   BKTree b;
   b._root = init_bknode();
 
+  if (dist_function == NULL) {
+    dist_function = l_dist;
+  }
+
   b.Add = bk_add;
   b.Search = search;
+  b.Dist = dist_function;
 
   return b;
 };
 
+BKTree init_bktree() {
+  return new_bktree(NULL);
+}
+
 // Procedural function to set a BK Tree to initialization values
 void init(BKTree *b) {
-  *(b) = init_bktree();
+  *(b) = new_bktree(NULL);
 }
 
 // Deallocates the BK Tree
