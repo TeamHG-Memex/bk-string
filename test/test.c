@@ -29,44 +29,70 @@ uint64_t inject(void *first, void *second) {
 }
 
 void test() {
-  printf("Testing injection of distance function in BK Tree.\n");
+  printf("Testing continued byte check: ");
+  // It should contain no continuation bits on single-byte unicode characters.
+  uint8_t *str = "a";
+  assert(is_not_continued_byte(str[0]));
+  assert(is_not_continued_byte(str[1]));
+  assert(is_not_continued_byte(str[2]));
+  assert(is_not_continued_byte(str[3]));
+  str = NULL;
+
+  // It should contain continuation bits on multi-byte unicode characters.
+  str = "\u263a";
+  assert(is_not_continued_byte(str[0]));
+  assert(!is_not_continued_byte(str[1]));
+  assert(!is_not_continued_byte(str[2]));
+  assert(is_not_continued_byte(str[3]));
+
+  printf("\u2714\n");
+
+
+  printf("Testing character compare: ");
+  // It should match when the character byte arrays match.
+  uint8_t char1[4] = {1, 1, 1, 1};
+  uint8_t char2[4] = {1, 1, 1, 1};
+
+  assert(!char_cmp(char1, char2));
+
+  // It should not match when one of the character byte arrays is changed.
+  char2[3] = 0;
+
+  assert(char_cmp(char1, char2));
+
+  printf("\u2714\n");
+
+
+  printf("Testing injection of distance function in BK Tree: ");
+  // "inject" is a dummy function which always returns 1.
   BKTree b = new_bktree(inject);
   b.Add("foo", &b);
   b.Add("bar", &b);
 
+  // It should return 1 regardless of the strings, and correctly store the words in the BK Tree.
   assert(b.Dist("foo", "bar") == 1);
   assert(!strcmp(b._root.child[1].word, "bar"));
 
   clear_bktree(&b);
 
+  // It should initialize by default with Levenshtein Distance.
   b = init_bktree();
 
+  // It should correctly use Levenshtein Distance.
   assert(b.Dist("foo", "bar") == 3);
 
   clear_bktree(&b);
-  printf("OK!\n");
+  printf("\u2714\n");
 
-  printf("Testing addition of items in BK Tree.\n");
-  // Test the BK Tree's "Add" method.
-  b = init_bktree();
-  b.Add("foo", &b);
-  assert(!strcmp(b._root.word, "foo"));
-  b.Add("bar", &b);
-  assert(!strcmp(b._root.child[3].word, "bar"));
-  b.Add("baz", &b);
-  assert(!strcmp(b._root.child[3].child[1].word, "baz"));
 
-  b.Add("bar", &b);
-  assert(!strcmp(b._root.word, "foo"));
-  printf("OK!\n");
-
-  printf("Testing Levenshtein Distance.\n");
+  printf("Testing Levenshtein Distance: ");
   // Test the Levenshtein Distance function.
   // Test that it is returning the correct distance, and not off by 1.
   assert(l_dist("foo", "bar") == 3);
   assert(l_dist("foo", "bar") != 2);
 
   // Test that it gives the same distance for two words given in either order.
+  // printf("dist: %zu\n", l_dist("foo", "foodingding"));
   assert(l_dist("bar", "baz") == 1);
   assert(l_dist("baz", "bar") == 1);
 
@@ -78,11 +104,32 @@ void test() {
   assert(l_dist("foo", "fooding") == 4);
   assert(l_dist("foo", "foodingding") == 8);
 
-  printf("OK!\n");
+  // Test for distances with unicode characters.
+  assert(l_dist("johndoe1", "johndoe\u263a") == 1);
+  assert(l_dist("johndoe1", "johndoe\u263a1") == 1);
+  assert(l_dist("johndoe1", "johndoe\u263a\u263a") == 2);
+  assert(l_dist("johndoe\u263a", "johndoe1") == 1);
 
-  printf("Testing BK Search.\n");
+  printf("\u2714\n");
+
+
+  printf("Testing addition of items in BK Tree: ");
+  // Test the BK Tree's "Add" method.
+  b = init_bktree();
+  b.Add("foo", &b);
+  assert(!strcmp(b._root.word, "foo"));
+  b.Add("bar", &b);
+  assert(!strcmp(b._root.child[3].word, "bar"));
+  b.Add("baz", &b);
+  assert(!strcmp(b._root.child[3].child[1].word, "baz"));
+
+  b.Add("bar", &b);
+  assert(!strcmp(b._root.word, "foo"));
+  printf("\u2714\n");
+
+  printf("Testing BK Search: ");
   // Test the BK search function
-  // Add 2 more members to the BK tree to ensure the search must expand
+  // Add more members to the BK tree to ensure the search must expand
   // the list past the original allocation.
   b.Add("bam", &b);
   b.Add("bat", &b);
@@ -122,10 +169,10 @@ void test() {
 
   free(list);
   list = NULL;
-  printf("OK!\n");
+  printf("\u2714\n");
 
   // Testing addition via array
-  printf("Testing addtion/searching via array.\n");
+  printf("Testing addtion/searching via array: ");
   b = init_bktree();
   uint8_t *arr[10] = {"foo", "bar", "baz", "bat", "food", "fan", "far", "bufar", "bingo", "alala"};
 
@@ -153,10 +200,13 @@ void test() {
   assert(has_word(list, "alala"));
   assert(!has_word(list, "bufar"));
   assert(list[7] == NULL);
+
   clear_bktree(&b);
+
   free(list);
   list = NULL;
-  printf("OK!\n");
+
+  printf("\u2714\n");
 }
 
 int main() {

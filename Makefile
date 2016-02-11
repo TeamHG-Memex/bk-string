@@ -1,6 +1,6 @@
 CC=gcc -fPIC
 ARCHIVE=ar rcs
-INCLUDES= -I./src -I./includes -I./test
+INCLUDES= -I./src -I./test
 SOURCES= $(shell echo src/*.c)
 HEADERS= $(shell echo src/*.h)
 OBJECTS= $(SOURCES:.c=.o)
@@ -12,6 +12,7 @@ bench: benchmark/bench.o $(OBJECTS)
 
 test: test/test.o $(OBJECTS)
 	$(CC) -o test/test test/test.o $(OBJECTS) $(INCLUDES)
+	test/test
 
 shared: $(OBJECTS)
 	$(CC) -o build/libbkstring.so -shared $(OBJECTS) $(INCLUDES)
