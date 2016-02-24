@@ -43,14 +43,19 @@ void bk_add(void *word_arg, BKTree *self) {
   BKNode *curNode = &self->_root;
   uint64_t dist = self->Dist(curNode->word, word);
 
+  if (dist == 0) {
+    // If "dist" is "0," the word is already stored, so it won't be added again.
+    return;
+  }
+
   while (!curNode->child[dist].empty) {
+    curNode = &curNode->child[dist];
+    dist = self->Dist(curNode->word, word);
+
     if (dist == 0) {
       // If "dist" is "0," the word is already stored, so it won't be added again.
       return;
     }
-
-    curNode = &curNode->child[dist];
-    dist = self->Dist(curNode->word, word);
   }
 
   // Since the current child is empty, we must initialize it.

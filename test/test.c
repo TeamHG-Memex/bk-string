@@ -278,7 +278,15 @@ void test_bktree_lib() {
   uint8_t** list = b.Search("bar", 2, &b);
   clear_bktree(&b);
 
-  // Test all the values given to the BK tree.
+  // Test that list has found the 24 words added.
+  uint64_t idx = 1;
+
+  while (list[idx + 1] != NULL) {
+    idx += 1;
+  }
+  assert(idx == 24);
+
+  // Test some of the values given to the BK tree.
   assert(has_word(list, "bar"));
   assert(has_word(list, "bat"));
   assert(has_word(list, "baz"));
