@@ -3,6 +3,7 @@
 
 #include "bkstring.h"
 #include "bkutil.h"
+#include "character.h"
 
 // Returns true if a list has a word in it.
 bool has_word(void* list_arg, void* word_arg) {
@@ -28,14 +29,104 @@ uint64_t inject(void *first, void *second) {
   return 1;
 }
 
-void test() {
-  printf("Testing continued byte check: ");
+void test_character_lib() {
+  printf("\n=========== Testing Character Library ================\n");
+
+  printf(" Testing map_chr: ");
+
+  Character chr = map_chr("\0");
+
+  assert(!chr.empty);
+
+  free_chr(&chr);
+
+  assert(chr.empty);
+
+  chr = map_chr("a");
+
+  assert(!chr.empty);
+
+  free_chr(&chr);
+
+  assert(chr.empty);
+
+  chr = map_chr("ab");
+
+  assert(chr.bytes[0] == 'a');
+  assert(chr.bytes[1] != 'b');
+  assert(chr.bytes[1] == 0);
+
+  free_chr(&chr);
+
+  printf("\u2714\n");
+
+
+  printf(" Testing chrcmp: ");
+
+  Character chr1 = map_chr("\u263a");
+  Character chr2 = map_chr("\u263a");
+
+  assert(!chrcmp(chr1, chr2));
+
+  free_chr(&chr1);
+  free_chr(&chr2);
+
+  chr1 = map_chr("\u263a");
+  chr2 = map_chr("\u263b");
+
+  // It should return a length similarly to how
+  assert(chrcmp(chr1, chr2) < 0);
+  assert(chrcmp(chr2, chr1) > 0);
+
+  free_chr(&chr1);
+  free_chr(&chr2);
+
+  printf("\u2714\n");
+
+
+  printf(" Testing string compare of character strings: ");
+
+  // It should return a negative number if the bytes from the first string are
+  // less than the bytes from the second.  It should return a positive number if
+  // the bytes from the first are greater than the bytes from the second.
+  Character *w1 = map_chr_str("foo");
+  Character *w2 = map_chr_str("bar");
+
+  assert(chr_strcmp(w1, w2) > 0);
+  assert(chr_strcmp(w2, w1) < 0);
+
+  free_chr_str(w1);
+  free_chr_str(w2);
+
+  // It should always return 0 regardless of order of arguments if the character strings are equal.
+  w1 = map_chr_str("foo");
+  w2 = map_chr_str("foo");
+
+  assert(chr_strcmp(w1, w2) == 0);
+  assert(chr_strcmp(w2, w1) == 0);
+
+  free_chr_str(w1);
+  free_chr_str(w2);
+
+  // It should always return 0 regardless of order of arguments if the character strings are equal.
+  w1 = map_chr_str("oof");
+  w2 = map_chr_str("foo");
+
+  assert(chr_strcmp(w1, w2) != 0);
+  assert(chr_strcmp(w2, w1) != 0);
+
+  free_chr_str(w1);
+  free_chr_str(w2);
+
+  printf("\u2714\n");
+
+
+  printf(" Testing continued byte check: ");
   // It should contain no continuation bits on single-byte unicode characters.
   uint8_t *str = "a";
   assert(is_not_continued_byte(str[0]));
   assert(is_not_continued_byte(str[1]));
-  assert(is_not_continued_byte(str[2]));
-  assert(is_not_continued_byte(str[3]));
+  assert(str[1] == 0);
   str = NULL;
 
   // It should contain continuation bits on multi-byte unicode characters.
@@ -44,26 +135,82 @@ void test() {
   assert(!is_not_continued_byte(str[1]));
   assert(!is_not_continued_byte(str[2]));
   assert(is_not_continued_byte(str[3]));
+  assert(str[3] == 0);
 
   printf("\u2714\n");
 
 
-  printf("Testing character compare: ");
-  // It should match when the character byte arrays match.
-  uint8_t char1[4] = {1, 1, 1, 1};
-  uint8_t char2[4] = {1, 1, 1, 1};
+  printf(" Testing character strings: ");
 
-  assert(!char_cmp(char1, char2));
+  str = "stuff and \u263a";
 
-  // It should not match when one of the character byte arrays is changed.
-  char2[3] = 0;
+  assert(strlen(str) == 13);
 
-  assert(char_cmp(char1, char2));
+  Character *chr_str = map_chr_str(str);
+
+  assert(chr_strlen(chr_str) == 11);
+
+  free_chr_str(chr_str);
+
+  printf("\u2714\n");
+
+  // TODO:60 Make the test below work after implementing a character string to byte array mapping function.
+  // printf("Testing from character string to byte string: ");
+  //
+  // str = "foo";
+  // chr_str = map_chr_str(str);
+  //
+  // assert(map_byte_str(chr_str) == str);
+  //
+  // printf("\u2714\n");
+}
+
+
+void test_bkutil_lib() {
+  printf("\n=========== Testing BK Util Library ==================\n");
+
+  printf(" Testing Levenshtein Distance: ");
+  // Test the Levenshtein Distance function.
+  // Test that it is returning the correct distance, and not off by 1.
+  assert(l_dist("foo", "bar") == 3);
+  assert(l_dist("foo", "bar") != 2);
+
+  // Test that it gives the same distance for two words given in either order.
+  assert(l_dist("bar", "baz") == 1);
+  assert(l_dist("baz", "bar") == 1);
+
+  // Test that a duplicate word gives a distance of 0.
+  assert(l_dist("foo", "foo") == 0);
+  assert(l_dist("bar", "bar") == 0);
+
+  // Test for distances of differing sized words.
+  assert(l_dist("foo", "fooding") == 4);
+  assert(l_dist("foo", "foodingding") == 8);
+
+  // Test for distances with unicode characters.
+  assert(l_dist("johndoe1", "johndoe\u263a") == 1);
+  assert(l_dist("johndoe1", "johndoe\u263a1") == 1);
+  assert(l_dist("johndoe1", "johndoe\u263a\u263a") == 2);
+  assert(l_dist("johndoe\u263a", "johndoe1") == 1);
 
   printf("\u2714\n");
 
 
-  printf("Testing injection of distance function in BK Tree: ");
+  printf(" Testing Modified Jaccard Distance: ");
+
+  assert(mod_j_dist("foo", "bar") == 100);
+  assert(mod_j_dist("bar", "ba") == 34);
+  assert(mod_j_dist("bar", "baz") == 50);
+  assert(mod_j_dist("GG", "GGGG") == 50);
+  assert(mod_j_dist("fooba 1234", "fooba1234") == 10);
+
+  printf("\u2714\n");
+}
+
+void test_bktree_lib() {
+  printf("\n=========== Testing BK Tree Library ==================\n");
+
+  printf(" Testing injection of distance function in BK Tree: ");
   // "inject" is a dummy function which always returns 1.
   BKTree b = new_bktree(inject);
   b.Add("foo", &b);
@@ -85,39 +232,12 @@ void test() {
   printf("\u2714\n");
 
 
-  printf("Testing Levenshtein Distance: ");
-  // Test the Levenshtein Distance function.
-  // Test that it is returning the correct distance, and not off by 1.
-  assert(l_dist("foo", "bar") == 3);
-  assert(l_dist("foo", "bar") != 2);
-
-  // Test that it gives the same distance for two words given in either order.
-  // printf("dist: %zu\n", l_dist("foo", "foodingding"));
-  assert(l_dist("bar", "baz") == 1);
-  assert(l_dist("baz", "bar") == 1);
-
-  // Test that a duplicate word gives a distance of 0.
-  assert(l_dist("foo", "foo") == 0);
-  assert(l_dist("bar", "bar") == 0);
-
-  // Test for distances of differing sized words.
-  assert(l_dist("foo", "fooding") == 4);
-  assert(l_dist("foo", "foodingding") == 8);
-
-  // Test for distances with unicode characters.
-  assert(l_dist("johndoe1", "johndoe\u263a") == 1);
-  assert(l_dist("johndoe1", "johndoe\u263a1") == 1);
-  assert(l_dist("johndoe1", "johndoe\u263a\u263a") == 2);
-  assert(l_dist("johndoe\u263a", "johndoe1") == 1);
-
-  printf("\u2714\n");
-
-
-  printf("Testing addition of items in BK Tree: ");
+  printf(" Testing addition of items in BK Tree: ");
   // Test the BK Tree's "Add" method.
   b = init_bktree();
   b.Add("foo", &b);
   assert(!strcmp(b._root.word, "foo"));
+  assert(has_word(b.Search("fod", 1, &b), "foo"));
   b.Add("bar", &b);
   assert(!strcmp(b._root.child[3].word, "bar"));
   b.Add("baz", &b);
@@ -127,7 +247,7 @@ void test() {
   assert(!strcmp(b._root.word, "foo"));
   printf("\u2714\n");
 
-  printf("Testing BK Search: ");
+  printf(" Testing BK Search: ");
   // Test the BK search function
   // Add more members to the BK tree to ensure the search must expand
   // the list past the original allocation.
@@ -172,7 +292,7 @@ void test() {
   printf("\u2714\n");
 
   // Testing addition via array
-  printf("Testing addtion/searching via array: ");
+  printf(" Testing addtion/searching via array: ");
   b = init_bktree();
   uint8_t *arr[10] = {"foo", "bar", "baz", "bat", "food", "fan", "far", "bufar", "bingo", "alala"};
 
@@ -207,6 +327,21 @@ void test() {
   list = NULL;
 
   printf("\u2714\n");
+
+  printf(" Specific Tests: ");
+  b = init_bktree();
+  b.Add("arromancy300", &b);
+
+  assert(has_word(b.Search("arromancy", 3, &b), "arromancy300"));
+  clear_bktree(&b);
+  printf("\u2714\n");
+}
+
+void test() {
+  test_character_lib();
+  test_bkutil_lib();
+  test_bktree_lib();
+  printf("\n Tests Completed!\n\n");
 }
 
 int main() {

@@ -9,7 +9,10 @@ const uint64_t CHILD_NODES = 256;
 // Adds a word to a given node.
 void add_child(void *word_arg, BKNode *self) {
   uint8_t *word = word_arg;
-  self->word = word;
+  uint64_t length = strlen(word) + 1;
+  self->word = handle_calloc(length, sizeof(uint8_t));
+  strcpy(self->word, word);
+
   self->empty = 0;
 };
 

@@ -26,28 +26,22 @@
 #include "bkslist.h"
 #include "bkstring.h"
 
-// TODO:10 Add the ability to add an array of strings to the BK Tree.
-// TODO:0 Add python wrapper for the following BK Tree functionality:
-//      .Add()
-//      .Search()
-//      init_bk_tree()
-//      free_bk_tree()
+// TODO:70 Add the ability to add an array of strings to the BK Tree.
 
 // A function to add a word to a BK Tree.
 void bk_add(void *word_arg, BKTree *self) {
-
   uint8_t *word = word_arg;
+
   // Check the root for an entry.
   if (self->_root.empty == 1) {
-    self->_root.word = word;
-    self->_root.empty = 0;
+    self->_root.AddChild(word, &self->_root);
 
     return;
   }
 
   // Initialize vars needed for tree buildling.
   BKNode *curNode = &self->_root;
-  size_t dist = self->Dist(curNode->word, word);
+  uint64_t dist = self->Dist(curNode->word, word);
 
   while (!curNode->child[dist].empty) {
     if (dist == 0) {
@@ -118,7 +112,7 @@ void* search(void *word_arg, uint64_t dist, BKTree *b) {
 };
 
 // Returns an initialized BK Tree.
-BKTree new_bktree(void* dist_function) {
+BKTree new_bktree(void *dist_function) {
   BKTree b;
   b._root = init_bknode();
 
@@ -138,8 +132,8 @@ BKTree init_bktree() {
 }
 
 // Procedural function to set a BK Tree to initialization values
-void init(BKTree *b) {
-  *(b) = new_bktree(NULL);
+void init(BKTree *b, void *dist_function) {
+  *(b) = new_bktree(dist_function);
 }
 
 // Deallocates the BK Tree

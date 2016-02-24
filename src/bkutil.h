@@ -23,8 +23,8 @@
 
 
 uint64_t l_dist(void *first_word, void *second_word);
-uint8_t char_cmp(uint8_t *char1, uint8_t *char2);
-uint8_t is_not_continued_byte(uint8_t byte);
+uint64_t j_dist(void *first_word, void *second_word);
+uint64_t mod_j_dist(void *first_word, void *second_word);
 void *handle_calloc(uint64_t len, size_t size);
 
 #endif
