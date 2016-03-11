@@ -7,6 +7,8 @@
 // TODO:20 Handle modified Jaccard Distance with n-grams
 
 uint64_t MAX_HEX_HAM_DIST = 256;
+uint64_t MAX_PERCENT_DIST = 100;
+
 
 // Returns the hamming distance between two strings made of hex characters.
 //
@@ -29,7 +31,6 @@ uint64_t hex_ham_dist(void *first_hash, void *second_hash) {
   if (len1 != len2) {
     return MAX_HEX_HAM_DIST;
   }
-
 
   // Converts a hex character to it's decimal value.
   uint8_t hex_to_dec(uint8_t value) {
@@ -79,6 +80,69 @@ uint64_t hex_ham_dist(void *first_hash, void *second_hash) {
   return sum;
 }
 
+// Returns Jaro Distance of two given strings multiplied by 100.  Strings are mapped to utf-8 characters
+// before their distance is compared.
+uint64_t jaro_dist(void *first_word, void *second_word) {
+  // If either string given is empty, return max distance
+  if (first_word == NULL || second_word == NULL) {
+    return MAX_PERCENT_DIST;
+  }
+
+  // UTF-8 character mapping
+  Character *first = map_chr_str(first_word);
+  Character *second = map_chr_str(second_word);
+  uint64_t len1 = chr_strlen(first);
+  uint64_t len2 = chr_strlen(second);
+
+  // If either string is empty after mapping, return max distance
+  if (len1 == 0 || len2 == 0) {
+    return MAX_PERCENT_DIST;
+  }
+
+  // Half is the max search distance within a string.
+  uint64_t half = max(len1, len2) / 2;
+  Character null = map_chr(NULL);
+
+  // These variable names are single-letter to make the formula for distance not heinously long.
+  // 'm' is for Matching characters
+  uint64_t m = 0;
+  // 't' is for Transpositioned characters
+  uint64_t t = 0;
+
+  for (uint64_t i = 0; i < len1; i++) {
+    for (uint64_t j = 0; j < half && i + j < len2; j++) {
+      // We check forwards first, if there is a match in the forwards direction, no transposition is needed.
+      if (!chrcmp(first[i], second[i + j])) {
+        m += 1;
+        second[i + j] = null;
+
+        // Only match once
+        break;
+      }
+
+      // We check backwards for transpositions, but only after searching for max distance forwards.
+      //
+      // We will match a transposition character closer to the position of the original character
+      // before attempting to match the next position for a normal match.
+      //
+      // This is to ensure that match position distances are minimized, so matches will be maximized.
+      if (i >= j && !chrcmp(first[i], second[i - j])) {
+        m += 1;
+        t += 1;
+        second[i - j] = null;
+
+        // Only match once
+        break;
+      }
+    }
+  }
+
+  free_chr_str(first);
+  free_chr_str(second);
+
+  return MAX_PERCENT_DIST - (MAX_PERCENT_DIST / 3 * ((float) m / len1 + (float) m / len2 + (float) (m - t) / m));
+}
+
 // Returns a modified Jaccard Distance.  Distance is returned between 0 and 100, where 0 would be complete
 // overlap between 2 strings, and 100 would be no overlap.
 //
@@ -89,7 +153,7 @@ uint64_t hex_ham_dist(void *first_hash, void *second_hash) {
 uint64_t mod_j_dist(void *first_word, void *second_word) {
   // Check to make sure the words exist before attempting to use distance on them.
   if (first_word == NULL || second_word == NULL) {
-    return 100;
+    return MAX_PERCENT_DIST;
   }
 
   // Map to UTF-8 characters
@@ -99,12 +163,11 @@ uint64_t mod_j_dist(void *first_word, void *second_word) {
   uint64_t len2 = chr_strlen(second);
 
   if (len1 == 0 || len2 == 0) {
-    return 100;
+    return MAX_PERCENT_DIST;
   }
 
   uint64_t intersect_count = 0;
   uint64_t union_count = len1 + len2;
-
   Character null = map_chr(NULL);
 
   for (uint64_t i = 0; i < len1; i++) {
@@ -122,9 +185,8 @@ uint64_t mod_j_dist(void *first_word, void *second_word) {
 
   free_chr_str(first);
   free_chr_str(second);
-  free_chr(&null);
 
-  uint64_t dist = 100 - ((100 * intersect_count) / union_count);
+  uint64_t dist = MAX_PERCENT_DIST - ((MAX_PERCENT_DIST * intersect_count) / union_count);
 
   return dist;
 }

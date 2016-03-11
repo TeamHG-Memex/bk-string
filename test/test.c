@@ -230,6 +230,15 @@ void test_bkutil_lib() {
   assert(hex_ham_dist("0590EB7E1129FA5B", "D7BBCB6C3A369040") == 28);
 
   printf("\u2714\n");
+
+
+  printf(" Testing Jaro Distance: ");
+
+  assert(jaro_dist("duane", "dwayne") == 18);
+  assert(jaro_dist("martha", "marhta") == 6);
+  assert(jaro_dist("dixon", "dicksonx") == 24);
+
+  printf("\u2714\n");
 }
 
 void test_bktree_lib() {
