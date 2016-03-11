@@ -233,10 +233,10 @@ void test_bkutil_lib() {
 
 
   printf(" Testing Jaro Distance: ");
-
   assert(jaro_dist("duane", "dwayne") == 18);
   assert(jaro_dist("martha", "marhta") == 6);
   assert(jaro_dist("dixon", "dicksonx") == 24);
+  assert(jaro_dist("1234567@", "12354@") == 14);
 
   printf("\u2714\n");
 }

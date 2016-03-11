@@ -109,12 +109,15 @@ uint64_t jaro_dist(void *first_word, void *second_word) {
   // 't' is for Transpositioned characters
   uint64_t t = 0;
 
+  uint64_t pos = 0;
+
   for (uint64_t i = 0; i < len1; i++) {
-    for (uint64_t j = 0; j < half && i + j < len2; j++) {
+    for (uint64_t j = 0; j < half && pos + j < len2; j++) {
       // We check forwards first, if there is a match in the forwards direction, no transposition is needed.
-      if (!chrcmp(first[i], second[i + j])) {
+      if (!chrcmp(first[i], second[pos + j])) {
         m += 1;
-        second[i + j] = null;
+        second[pos + j] = null;
+        pos += 1;
 
         // Only match once
         break;
@@ -126,10 +129,11 @@ uint64_t jaro_dist(void *first_word, void *second_word) {
       // before attempting to match the next position for a normal match.
       //
       // This is to ensure that match position distances are minimized, so matches will be maximized.
-      if (i >= j && !chrcmp(first[i], second[i - j])) {
+      if (pos >= j && !chrcmp(first[i], second[pos - j])) {
         m += 1;
         t += 1;
-        second[i - j] = null;
+        second[pos - j] = null;
+        pos += 1;
 
         // Only match once
         break;
