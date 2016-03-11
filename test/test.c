@@ -205,6 +205,31 @@ void test_bkutil_lib() {
   assert(mod_j_dist("fooba 1234", "fooba1234") == 10);
 
   printf("\u2714\n");
+
+
+  printf(" Testing Hex Hamming Distance: ");
+  // TODO:10 Failing tests for hex_ham_dist after official unit test suite is in place.
+
+  // A bunch of sample hamming distances to compute.  All should match.
+  assert(hex_ham_dist("0590eb7e1129fa5b", "435e9db1634baca2") == 36);
+  assert(hex_ham_dist("0590eb7e1129fa5b", "e13c832b7ce2720f") == 30);
+  assert(hex_ham_dist("0590eb7e1129fa5b", "cd87c969b794125a") == 28);
+  assert(hex_ham_dist("0590eb7e1129fa5b", "096d864c93b396b7") == 32);
+  assert(hex_ham_dist("0590eb7e1129fa5b", "6dc3693d11d0da4b") == 20);
+  assert(hex_ham_dist("0590eb7e1129fa5b", "4f6ad94847cd2539") == 34);
+  assert(hex_ham_dist("0590eb7e1129fa5b", "33edac42c731b135") == 34);
+  assert(hex_ham_dist("0590eb7e1129fa5b", "9327939737447c1c") == 34);
+  assert(hex_ham_dist("0590eb7e1129fa5b", "5fa9e49021de9176") == 36);
+  assert(hex_ham_dist("0590eb7e1129fa5b", "a991569a1a66ed99") == 30);
+  assert(hex_ham_dist("0590eb7e1129fa5b", "eb90ed295a62b465") == 30);
+  assert(hex_ham_dist("0590eb7e1129fa5b", "4d67581a3f97283c") == 36);
+  assert(hex_ham_dist("0590eb7e1129fa5b", "87506bfe01a4f84f") == 14);
+  assert(hex_ham_dist("0590eb7e1129fa5b", "9fade410215e517e") == 34);
+  assert(hex_ham_dist("0590eb7e1129fa5b", "d7bbcb6c3a369040") == 28);
+
+  assert(hex_ham_dist("0590EB7E1129FA5B", "D7BBCB6C3A369040") == 28);
+
+  printf("\u2714\n");
 }
 
 void test_bktree_lib() {

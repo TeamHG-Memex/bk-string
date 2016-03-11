@@ -25,6 +25,7 @@
 uint64_t l_dist(void *first_word, void *second_word);
 uint64_t j_dist(void *first_word, void *second_word);
 uint64_t mod_j_dist(void *first_word, void *second_word);
+uint64_t hex_ham_dist(void *first_hash, void *second_hash);
 void *handle_calloc(uint64_t len, size_t size);
 
 #endif
