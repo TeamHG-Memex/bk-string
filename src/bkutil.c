@@ -94,46 +94,55 @@ uint64_t jaro_dist(void *first_word, void *second_word) {
   uint64_t len1 = chr_strlen(first);
   uint64_t len2 = chr_strlen(second);
 
+  if (len1 == 0 && len2 == 0) {
+    return 0;
+  }
+
   // If either string is empty after mapping, return max distance
   if (len1 == 0 || len2 == 0) {
     return MAX_PERCENT_DIST;
   }
 
+  // This implementation assumes len1 is greater than or equal to len2.
+  if (len1 < len2) {
+    free_chr_str(first);
+    free_chr_str(second);
+
+    first = map_chr_str(second_word);
+    second = map_chr_str(first_word);
+    len1 = chr_strlen(first);
+    len2 = chr_strlen(second);
+  }
+
   // Half is the max search distance within a string.
-  uint64_t half = max(len1, len2) / 2;
+  uint64_t half = len1 / 2;
   Character null = map_chr(NULL);
 
   // These variable names are single-letter to make the formula for distance not heinously long.
   // 'm' is for Matching characters
   uint64_t m = 0;
-  // 't' is for Transpositioned characters
-  uint64_t t = 0;
 
-  uint64_t pos = 0;
+  // This set is used to detect transpositions by tracking the index of each matched character
+  // from the second string.
+  uint64_t match_set[len2 + 1];
 
   for (uint64_t i = 0; i < len1; i++) {
-    for (uint64_t j = 0; j < half && pos + j < len2; j++) {
+    for (uint64_t j = 0; j < half; j++) {
       // We check forwards first, if there is a match in the forwards direction, no transposition is needed.
-      if (!chrcmp(first[i], second[pos + j])) {
+      if (i + j < len2 && !chrcmp(first[i], second[i + j])) {
+        match_set[m] = i + j;
+        second[i + j] = null;
         m += 1;
-        second[pos + j] = null;
-        pos += 1;
 
         // Only match once
         break;
       }
 
-      // We check backwards for transpositions, but only after searching for max distance forwards.
-      //
-      // We will match a transposition character closer to the position of the original character
-      // before attempting to match the next position for a normal match.
-      //
-      // This is to ensure that match position distances are minimized, so matches will be maximized.
-      if (pos >= j && !chrcmp(first[i], second[pos - j])) {
+      // Search backwards within the allowable number of characters for matches.
+      if (i >= j && i - j < len2 && !chrcmp(first[i], second[i - j])) {
+        match_set[m] = i - j;
+        second[i - j] = null;
         m += 1;
-        t += 1;
-        second[pos - j] = null;
-        pos += 1;
 
         // Only match once
         break;
@@ -141,10 +150,25 @@ uint64_t jaro_dist(void *first_word, void *second_word) {
     }
   }
 
+  // 't' is for Transpositioned characters
+  uint64_t t = 0;
+
+  for (uint64_t i = 0; i + 1 < m; i++) {
+    if (match_set[i] > match_set[i + 1]) {
+      // If the current matched character's index is greater than the next matched character's
+      // index, this is a transposition.
+      t += 1;
+    }
+  }
+
+  if (m == 0) {
+    return MAX_PERCENT_DIST;
+  }
+
   free_chr_str(first);
   free_chr_str(second);
 
-  return MAX_PERCENT_DIST - (MAX_PERCENT_DIST / 3 * ((float) m / len1 + (float) m / len2 + (float) (m - t) / m));
+  return MAX_PERCENT_DIST - (uint64_t) ((float) MAX_PERCENT_DIST / 3 * ((float) m / len1 + (float) m / len2 + (float) (m - t) / m));
 }
 
 // Returns a modified Jaccard Distance.  Distance is returned between 0 and 100, where 0 would be complete
@@ -189,6 +213,7 @@ uint64_t mod_j_dist(void *first_word, void *second_word) {
 
   free_chr_str(first);
   free_chr_str(second);
+  free_chr(&null);
 
   uint64_t dist = MAX_PERCENT_DIST - ((MAX_PERCENT_DIST * intersect_count) / union_count);
 

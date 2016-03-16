@@ -233,6 +233,18 @@ void test_bkutil_lib() {
 
 
   printf(" Testing Jaro Distance: ");
+
+  // Test minimum dist
+  assert(jaro_dist("foo", "foo") == 0);
+
+  // Test maximum dist
+  assert(jaro_dist("123456", "456123") == 100);
+  assert(jaro_dist(NULL, NULL) == 100);
+
+  // Test communtative property of Jaro Distance
+  assert(jaro_dist("longererererer", "shorter") == jaro_dist("shorter", "longererererer"));
+
+  // Test some sample scores
   assert(jaro_dist("duane", "dwayne") == 18);
   assert(jaro_dist("martha", "marhta") == 6);
   assert(jaro_dist("dixon", "dicksonx") == 24);
