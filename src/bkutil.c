@@ -1,5 +1,6 @@
 #include "bkutil.h"
 #include "character.h"
+#include <stdint.h>
 
 // TODO:0 Implement Jaccard Distance
 // TODO:40 Handle Levenshtein Distance with n-grams
@@ -9,6 +10,44 @@
 uint64_t MAX_HEX_HAM_DIST = 256;
 uint64_t MAX_PERCENT_DIST = 100;
 
+
+// Converts a hex character to it's decimal value.
+uint8_t hex_to_dec(uint8_t value) {
+  // Check if the character is a valid hex character before attempting to convert it.
+  if (
+    value < 48 ||
+    value > 57 && value < 65 ||
+    value > 70 && value < 97 ||
+    value > 102
+  ) {
+    // If the character is invalid for hex, we will error with hopefully a helpful message.
+    fprintf(stderr, "Found unexpected character \"%c\" which is outside the range of hex values.\n", value);
+    exit(EXIT_FAILURE);
+  }
+
+  uint8_t out;
+  sscanf(&value, "%x", &out);
+
+  return (uint8_t) out;
+}
+
+// Returns the compared value of the hex character.
+uint64_t hex_char_cmp(uint8_t value1, uint8_t value2) {
+  uint8_t val1 = hex_to_dec(value1);
+  uint8_t val2 = hex_to_dec(value2);
+
+  uint64_t sum = 0;
+
+  // Find the binary value for 8 positions in binary array created by the hex value,
+  // and add to the internal sum when they are different.
+  for (uint64_t i = 0; i < 8; i++) {
+    if ((val2 >> i & 1) != (val1 >> i & 1)) {
+      sum += 1;
+    }
+  }
+
+  return sum;
+}
 
 // Returns the hamming distance between two strings made of hex characters.
 //
@@ -32,43 +71,6 @@ uint64_t hex_ham_dist(void *first_hash, void *second_hash) {
     return MAX_HEX_HAM_DIST;
   }
 
-  // Converts a hex character to it's decimal value.
-  uint8_t hex_to_dec(uint8_t value) {
-    // Check if the character is a valid hex character before attempting to convert it.
-    if (
-      value < 48 ||
-      value > 57 && value < 65 ||
-      value > 70 && value < 97 ||
-      value > 102
-    ) {
-      // If the character is invalid for hex, we will error with hopefully a helpful message.
-      fprintf(stderr, "Found unexpected character \"%c\" which is outside the range of hex values.\n", value);
-      exit(EXIT_FAILURE);
-    }
-
-    uint out;
-    sscanf(&value, "%x", &out);
-
-    return (uint8_t) out;
-  }
-
-  // Returns the compared value of the hex character.
-  uint64_t hex_char_cmp(uint8_t value1, uint8_t value2) {
-    uint8_t val1 = hex_to_dec(value1);
-    uint8_t val2 = hex_to_dec(value2);
-
-    uint64_t sum = 0;
-
-    // Find the binary value for 8 positions in binary array created by the hex value,
-    // and add to the internal sum when they are different.
-    for (uint64_t i = 0; i < 8; i++) {
-      if ((val2 >> i & 1) != (val1 >> i & 1)) {
-        sum += 1;
-      }
-    }
-
-    return sum;
-  }
 
   uint64_t sum = 0;
 
