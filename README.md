@@ -111,3 +111,7 @@ Thank You Mary Rose Cook for supplying a long list of common usernames.
 
 ## Maintainers
 * Brian C. Mackintosh
+
+---
+
+[![define hyperion gray](https://hyperiongray.s3.amazonaws.com/define-hg.svg)](https://hyperiongray.com/?pk_campaign=github&pk_kwd=bk-string "Hyperion Gray")
