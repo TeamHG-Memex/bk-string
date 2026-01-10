@@ -123,6 +123,13 @@ uint64_t count_non_continued_bytes(void *str) {
   return count;
 }
 
+// Super secret internal helper function for resetting the byte array.
+void reset_byte_arr(uint8_t *bytes) {
+  for (uint64_t i = 0; i < 4; i++) {
+    bytes[i] = 0;
+  }
+}
+
 // Returns a Character array which is terminated by a null Character.
 Character *map_chr_str(void *str) {
   uint8_t *string = str;
@@ -134,13 +141,6 @@ Character *map_chr_str(void *str) {
   uint8_t byte_arr[4] = { 0 };
   uint8_t byte_idx = 0;
   uint64_t str_idx = 0;
-
-  // Super secret internal helper function for resetting the byte array.
-  void reset_byte_arr(uint8_t *bytes) {
-    for (uint64_t i = 0; i < 4; i++) {
-      bytes[i] = 0;
-    }
-  }
 
   // Loop through all bytes in the string, collect bytes in an array to be stored as a
   // single character.
